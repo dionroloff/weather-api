@@ -1,0 +1,42 @@
+#!/home/root/venvs/experiment/bin/python
+
+import os
+import requests
+import sys
+
+from argparse import ArgumentParser
+
+parser = ArgumentParser(description='Get the current weather information for your zipcode')
+parser.add_argument('zip', help='zip/postal code to get weather for')
+parser.add_argument('--country', default='us', help='country zip/postal belongs to, default is "us"')
+
+args = parser.parse_args()
+
+api_key = os.getenv("OWM_API_KEY")
+
+if not api_key:
+    print("ERROR: no 'OWM_API_KEY' provided")
+    sys.exit(1)
+
+url = f"https://api.openweathermap.org/data/2.5/weather?zip={args.zip},{args.country}&appid={api_key}"
+
+res = requests.get(url)
+
+if res.status_code != 200:
+    print(f"Error in getting weather: {res.status_code}")
+    sys.exit(1)
+
+import math
+weather = res.json()
+temp = math.floor(weather['main']['temp'] * 1.8 - 459.67)
+conditions = weather['weather'][0]['main']
+
+print(f"The tempurature in {weather['name']} is {temp} degrees Fahrenheit and the conditions are {conditions}.")
+
+
+
+
+
+
+
+
